@@ -2,7 +2,8 @@
 const weatherApi = "https://api.weather.gov/alerts/active?area="
 
 // Your code here!
-
+// index.js
+// index.js
 
 // DOM Elements
 const stateInput = document.getElementById('state-input');
@@ -33,53 +34,46 @@ async function fetchWeatherAlerts() {
     }
 
     try {
-        const response = await fetch(weatherApi + state, {
-            headers: {
-                'User-Agent': 'WeatherAlertsApp/1.0 (your.email@example.com)',
-                'Accept': 'application/geo+json'
-            }
-        });
+        const response = await fetch(weatherApi + state);
 
         if (!response.ok) {
-            throw new Error(`HTTP Error! Status: ${response.status}`);
+            throw new Error('Network failure');
         }
 
         const data = await response.json();
         
         displayAlerts(data, state);
         
-        // IMPORTANT: Clear input after successful fetch (required by test)
+        // Clear input after successful fetch (required by test)
         stateInput.value = '';
 
     } catch (error) {
-        console.error(error);
-        showError("Failed to fetch weather alerts. Please check your connection and try again.");
+        showError(error.message || 'Network failure');
     }
 }
 
 function displayAlerts(data, state) {
     const features = data.features || [];
 
+    // Match test expectation: "Weather Alerts: X"
+    alertsDisplay.innerHTML = `<h2>Weather Alerts: ${features.length}</h2>`;
+
     if (features.length === 0) {
-        alertsDisplay.innerHTML = `
+        alertsDisplay.innerHTML += `
             <div class="no-alerts">
-                No active weather alerts for <strong>${state}</strong> at this time.
+                No active weather alerts for ${state} at this time.
             </div>`;
         return;
     }
 
-    let html = `<h2>Active Alerts for ${state} (${features.length})</h2>`;
-
     features.forEach((alert) => {
         const props = alert.properties || {};
-        html += `
+        const headline = props.headline || 'Weather Alert';
+        alertsDisplay.innerHTML += `
             <div class="alert">
-                <strong>${props.headline || 'Weather Alert'}</strong><br>
-                <small>${props.description ? props.description.substring(0, 250) + '...' : 'No description available'}</small>
+                <strong>${headline}</strong>
             </div>`;
     });
-
-    alertsDisplay.innerHTML = html;
 }
 
 function showError(message) {
