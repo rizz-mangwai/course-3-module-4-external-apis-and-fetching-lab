@@ -2,8 +2,7 @@
 const weatherApi = "https://api.weather.gov/alerts/active?area="
 
 // Your code here!
-// index.js
-const weatherApi = "https://api.weather.gov/alerts/active?area=";
+
 
 // DOM Elements
 const stateInput = document.getElementById('state-input');
@@ -27,7 +26,7 @@ async function fetchWeatherAlerts() {
     alertsDisplay.innerHTML = '';
     errorMessage.classList.add('hidden');
 
-    // Validation
+    // Input Validation
     if (!state || state.length !== 2 || !/^[A-Z]{2}$/.test(state)) {
         showError("Please enter a valid 2-letter U.S. state code (e.g., NY, CA, TX)");
         return;
@@ -46,11 +45,15 @@ async function fetchWeatherAlerts() {
         }
 
         const data = await response.json();
+        
         displayAlerts(data, state);
+        
+        // IMPORTANT: Clear input after successful fetch (required by test)
+        stateInput.value = '';
 
     } catch (error) {
         console.error(error);
-        showError("Failed to fetch weather alerts. Please check your internet connection and try again.");
+        showError("Failed to fetch weather alerts. Please check your connection and try again.");
     }
 }
 
